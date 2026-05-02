@@ -36,6 +36,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ url: cloudUrl, provider: "cloudinary" });
   }
 
+  if (process.env.VERCEL) {
+    return NextResponse.json(
+      {
+        error:
+          "Image upload requires Cloudinary on this deployment. Set CLOUDINARY_CLOUD_NAME and CLOUDINARY_UPLOAD_PRESET in the Vercel project env vars.",
+      },
+      { status: 503 }
+    );
+  }
+
   const dir = path.join(process.cwd(), "public", "uploads");
   await mkdir(dir, { recursive: true });
   const dest = path.join(dir, filename);
