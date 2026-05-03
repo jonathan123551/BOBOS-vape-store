@@ -2,10 +2,7 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   darkMode: "class",
-  content: [
-    "./app/**/*.{ts,tsx,js,jsx}",
-    "./components/**/*.{ts,tsx,js,jsx}",
-  ],
+  content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
   theme: {
     extend: {
       colors: {
@@ -29,12 +26,14 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
-        arabic: ["var(--font-arabic)", "Tajawal", "sans-serif"],
+        sans: ["Inter", "system-ui", "sans-serif"],
+        arabic: ["Tajawal", "system-ui", "sans-serif"],
       },
       boxShadow: {
-        "neon-purple": "0 0 18px rgba(168,85,247,.55), 0 0 36px rgba(168,85,247,.25)",
-        "neon-cyan": "0 0 18px rgba(34,211,238,.55), 0 0 36px rgba(34,211,238,.25)",
+        "neon-purple":
+          "0 0 18px rgba(168,85,247,.55), 0 0 36px rgba(168,85,247,.25)",
+        "neon-cyan":
+          "0 0 18px rgba(34,211,238,.55), 0 0 36px rgba(34,211,238,.25)",
       },
       backgroundImage: {
         "smoke-radial":
@@ -42,7 +41,7 @@ const config: Config = {
       },
       animation: {
         "pulse-slow": "pulse 3s cubic-bezier(0.4,0,0.6,1) infinite",
-        "glow": "glow 3s ease-in-out infinite",
+        glow: "glow 3s ease-in-out infinite",
       },
       keyframes: {
         glow: {
