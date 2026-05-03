@@ -1,14 +1,10 @@
 node_modules
-.next
-out
-build
 dist
+build
 .env
 .env.local
 .env.*.local
-prisma/dev.db
-prisma/dev.db-journal
 *.log
 .DS_Store
-public/uploads/*
-!public/uploads/.gitkeep
+.vite
+.eslintcache

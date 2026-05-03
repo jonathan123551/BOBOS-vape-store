@@ -1,113 +1,136 @@
 # BOBOS Vapes Store
 
-A full-stack e-commerce store for **BOBOS Vapes Store** built as a single Next.js (App Router) application — frontend, API, and admin panel all in one deployment. Designed to run perfectly on Replit with zero external services.
+A full-stack e-commerce storefront for vapes, pods, and e-liquids — built with **Vite + React + TypeScript + Tailwind + Supabase**, designed for one-click publish on **Lovable.app**.
 
-## Features
+- 🌑 Dark / ☀️ light theme toggle (default dark, neon glow accents)
+- 🇪🇬 EN + AR with full RTL flip and Tajawal font
+- 🛒 Persistent cart (localStorage) with floating cart button + mobile-friendly card layout
+- 📞 Click-to-call + WhatsApp contact buttons
+- 🗄️ Supabase Postgres + RLS for products / categories / orders
+- 🪶 Static seed fallback so the app runs immediately, before Supabase is configured
 
-### Storefront
-- Dark mode (default) and light mode with neon/glow accents
-- English (LTR) and Arabic (RTL) — language toggle persists per user
-- Browse products and shop by category
-- Product detail page with flavor / nicotine info and stock availability
-- Cart with quantity controls (persisted in localStorage)
-- Checkout (no auth) — collects name, phone, address; creates an order and decrements stock
-- Contact page with click-to-call and WhatsApp group buttons
-- Toast notifications, loading states, and form validation
-
-### Admin panel (`/admin`)
-- Simple env-based credential login (HMAC signed cookie, 7-day expiry)
-- **Dashboard**: total orders, revenue, status breakdown, sales line chart (daily / weekly / monthly), top products, top categories, custom date filtering
-- **Orders**: list, filter by status, expand to view items, update status (pending → out for delivery → done / cancelled)
-- **Products**: full CRUD with bilingual name/description, price, stock, image, optional flavor and nicotine fields, category, featured flag
-- **Categories**: full CRUD with bilingual names, auto-generated slugs, image
-- **Image upload**: local (`/public/uploads`) by default, with optional Cloudinary fallback via env vars
-
-## Tech stack
-
-- [Next.js 14](https://nextjs.org/) (App Router) — fullstack framework, API routes
-- [TypeScript](https://www.typescriptlang.org/)
-- [Tailwind CSS](https://tailwindcss.com/) — branded design system
-- [Prisma ORM](https://www.prisma.io/) — SQLite by default, swap to PostgreSQL via `DATABASE_URL`
-- [Recharts](https://recharts.org/) — admin dashboard charts
-- [Zod](https://zod.dev/) — request validation
-- [react-hot-toast](https://react-hot-toast.com/) — toasts
+---
 
 ## Quick start (local)
 
 ```bash
-# 1. Install
 npm install
-
-# 2. Copy env
-cp .env.example .env
-
-# 3. Initialize the database (creates SQLite file + seeds demo data)
-npm run setup
-
-# 4. Run
-npm run dev
+cp .env.example .env       # leave as-is for the static-seed preview
+npm run dev                # http://localhost:3000
 ```
 
-Open http://localhost:3000 — the storefront. Open http://localhost:3000/admin/login for the admin panel (default credentials are in `.env.example`).
+The storefront comes up immediately with the demo catalog from `src/lib/seed.ts`. Wire up Supabase below to switch to a real backend.
 
-## Deploying on Replit
+---
 
-1. Create a new Repl from this GitHub repo (Import from GitHub).
-2. In the **Secrets** panel, set the following (mirrors `.env.example`):
-   - `DATABASE_URL` = `file:./prisma/dev.db` (default SQLite, zero-config) **or** a Postgres URL
-   - `ADMIN_USERNAME` = your admin username
-   - `ADMIN_PASSWORD` = a strong admin password
-   - `ADMIN_SECRET` = a long random string (run `openssl rand -hex 32` to generate)
-   - `NEXT_PUBLIC_STORE_PHONE` = `01287566246`
-   - `NEXT_PUBLIC_WHATSAPP_LINK` = `https://chat.whatsapp.com/Es1cmi0a7Mp8Qz4PtyiDgF?mode=hqctcli`
-   - *(optional)* `CLOUDINARY_*` for cloud image hosting
-3. In the Replit shell, run once:
-   ```bash
-   npm install
-   npm run setup
-   ```
-4. Set the **Run command** to:
-   ```bash
-   npm run build && npm run start
-   ```
-   *(For development you can use `npm run dev` instead.)*
-5. Hit **Run**. The site will be served on the Replit URL.
+## Deploying to Lovable
 
-> **Tip**: SQLite works perfectly for development on Replit. For production traffic with persistence across Repl restarts, use a hosted Postgres (Neon, Supabase, etc.) and set `DATABASE_URL` accordingly. Then change `prisma/schema.prisma`'s `datasource db { provider = "postgresql" }` and run `npx prisma db push`.
+1. Push this repo to GitHub (already done if you're reading this).
+2. Open [lovable.dev/projects](https://lovable.dev/projects) → **Import GitHub repo** → pick this repo.
+3. Lovable detects it as a Vite + React project automatically. Click **Publish**.
+4. (Optional) Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in Lovable's environment variables once your Supabase project is ready (see below).
 
-## Default admin credentials
+That's it. The published `*.lovable.app` URL is your live storefront.
 
-Configured via env (`ADMIN_USERNAME`, `ADMIN_PASSWORD`). The `.env.example` ships with placeholder values — **change these before deploying**.
+---
 
-## Scripts
+## Wiring up Supabase (5 minutes)
 
-| Script | Description |
-| --- | --- |
-| `npm run dev` | Start the dev server on port 3000 |
-| `npm run build` | Generate Prisma client + production build |
-| `npm run start` | Start the production server |
-| `npm run lint` | Run ESLint |
-| `npm run db:push` | Sync Prisma schema with the database |
-| `npm run db:seed` | Seed demo categories and products |
-| `npm run setup` | `db:push` + `db:seed` (one-shot first-run) |
+The app will use Supabase for products, categories, and orders as soon as `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set. Until then, it reads from `src/lib/seed.ts`.
+
+### 1. Create a project
+- Go to [supabase.com/dashboard](https://supabase.com/dashboard) → **New Project**.
+- Name it `bobos`, choose the closest region, generate a strong DB password, click **Create**.
+
+### 2. Apply the schema + seed
+Copy-paste each SQL file into **SQL Editor → New query** (or use the Supabase CLI), in this order:
+
+1. `supabase/migrations/20260503000000_init.sql` — creates `categories`, `products`, `orders`, `order_items` and RLS policies.
+2. `supabase/seed.sql` — inserts the 4 demo categories + 8 demo products.
+
+### 3. Grab your keys
+**Settings → API**:
+- Copy the **Project URL** → set as `VITE_SUPABASE_URL`.
+- Copy the **anon public** key → set as `VITE_SUPABASE_ANON_KEY`.
+
+Both are safe to expose in the client; RLS policies enforce access.
+
+### 4. Set env vars
+- **Local:** edit `.env` (copy from `.env.example`) and restart `npm run dev`.
+- **Lovable:** project settings → Environment Variables → add both.
+
+The storefront now reads live data from Supabase, and checkout writes to the `orders` + `order_items` tables.
+
+---
 
 ## Project structure
 
 ```
-app/                     Next.js App Router routes
-  api/                   API endpoints (products, categories, orders, admin, upload)
-  admin/                 Admin login + (authed) dashboard, orders, products, categories
-  products/              Storefront catalog + product detail
-  cart/, checkout/       Cart + no-auth checkout flow
-  contact/               Contact page (phone + WhatsApp)
-components/              UI primitives, storefront and admin components
-lib/                     Prisma client, auth, i18n, formatters, cloudinary
-prisma/
-  schema.prisma          Models: Category, Product, Order, OrderItem
-  seed.ts                Demo data
-public/                  Static assets + uploaded images (`/public/uploads`)
+src/
+  main.tsx            # Vite entry
+  App.tsx             # Router + global providers
+  index.css           # Tailwind + brand tokens
+  components/
+    Header.tsx        # sticky top nav + lang/theme toggles + mobile menu
+    Footer.tsx
+    Layout.tsx
+    Logo.tsx
+    FloatingCartButton.tsx   # bottom-end FAB, RTL-aware, hidden on /cart, /checkout, /admin
+    ProductCard.tsx
+    CartView.tsx      # table on md+, stacked cards on <md
+  contexts/
+    CartContext.tsx   # localStorage-backed cart, hydration-safe
+    LangContext.tsx   # EN/AR + dir + html lang/dir wiring
+    ThemeContext.tsx  # dark/light + .dark class on <html>
+  lib/
+    supabase.ts       # client + isSupabaseConfigured flag
+    products.ts       # data layer — Supabase or static seed
+    orders.ts         # createOrder() — Supabase or local stub
+    seed.ts           # static demo catalog
+    i18n.ts
+    format.ts
+  pages/
+    Home.tsx, Products.tsx, ProductDetail.tsx,
+    Cart.tsx, Checkout.tsx, Contact.tsx, NotFound.tsx
+supabase/
+  migrations/         # initial schema + RLS
+  seed.sql            # demo categories + products
 ```
 
-## License
+---
 
-MIT
+## Branding constants (env)
+
+| Variable                  | Default                       |
+|---------------------------|-------------------------------|
+| `VITE_STORE_PHONE`        | `01287566246`                 |
+| `VITE_WHATSAPP_LINK`      | (BOBOS WhatsApp group invite) |
+
+These are read in `src/components/Footer.tsx` and `src/pages/Contact.tsx` — override them via `.env` if your contact info changes.
+
+---
+
+## Scripts
+
+- `npm run dev` — dev server on http://localhost:3000
+- `npm run build` — type-check + production bundle into `dist/`
+- `npm run preview` — preview the production bundle locally
+- `npm run lint` — ESLint
+- `npm run typecheck` — TypeScript only, no emit
+
+---
+
+## Admin panel
+
+Not yet ported in this iteration. The Next.js admin (dashboard, orders status updates, products / categories CRUD, image uploads via Cloudinary) is being rebuilt on Supabase Auth + Storage in a follow-up PR. Storefront + checkout work end-to-end today.
+
+---
+
+## Tech stack
+
+- **Vite 5** + **React 18** + **TypeScript 5**
+- **Tailwind CSS 3** with custom brand tokens (purple/cyan neon)
+- **react-router-dom 6** for client-side routing
+- **react-hot-toast** for notifications
+- **@supabase/supabase-js 2** for the backend
+- Google Fonts: **Inter** (LTR) + **Tajawal** (RTL)
