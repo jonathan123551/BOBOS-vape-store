@@ -26,7 +26,73 @@ export function CartView() {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl md:text-4xl font-bold glow-text">{dict.cart.title}</h1>
-      <div className="card neon-border overflow-hidden">
+
+      {/* Mobile: stacked cards */}
+      <ul className="md:hidden space-y-3" role="list">
+        {items.map((i) => {
+          const name = lang === "ar" && i.nameAr ? i.nameAr : i.name;
+          return (
+            <li key={i.productId} className="card neon-border p-4 space-y-3">
+              <div className="flex items-start gap-3">
+                <div className="w-16 h-16 shrink-0 rounded-lg bg-black/30 overflow-hidden grid place-items-center">
+                  {i.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={i.image} alt={name} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-2xl">💨</span>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium leading-tight">{name}</p>
+                  <p className="text-sm opacity-70 mt-0.5">
+                    {formatPrice(i.price, lang)}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => remove(i.productId)}
+                  className="text-red-400 hover:text-red-300 text-xs shrink-0"
+                  aria-label={dict.cart.remove}
+                >
+                  {dict.cart.remove}
+                </button>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center rounded-lg border border-[rgb(var(--border))] overflow-hidden">
+                  <button
+                    type="button"
+                    className="px-3 py-1.5"
+                    onClick={() => setQty(i.productId, i.quantity - 1)}
+                    aria-label="-"
+                  >
+                    −
+                  </button>
+                  <span className="px-4 min-w-10 text-center" aria-live="polite">
+                    {i.quantity}
+                  </span>
+                  <button
+                    type="button"
+                    className="px-3 py-1.5"
+                    onClick={() => setQty(i.productId, i.quantity + 1)}
+                    aria-label="+"
+                  >
+                    +
+                  </button>
+                </div>
+                <div className="text-end">
+                  <span className="block text-xs opacity-70">{dict.cart.subtotal}</span>
+                  <strong className="text-base">
+                    {formatPrice(i.price * i.quantity, lang)}
+                  </strong>
+                </div>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+
+      {/* md+ : table */}
+      <div className="hidden md:block card neon-border overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-black/20">
             <tr className="text-left">
@@ -91,16 +157,17 @@ export function CartView() {
           </tbody>
         </table>
       </div>
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        <Link href="/products" className="btn-ghost">
+
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <Link href="/products" className="btn-ghost w-full sm:w-auto">
           {dict.cart.continue}
         </Link>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
           <div className="text-lg">
             <span className="opacity-70 me-2">{dict.cart.total}:</span>
             <strong className="text-xl">{formatPrice(total, lang)}</strong>
           </div>
-          <Link href="/checkout" className="btn-primary">
+          <Link href="/checkout" className="btn-primary w-full sm:w-auto">
             {dict.cart.checkout}
           </Link>
         </div>

@@ -48,6 +48,7 @@ export const dictionaries = {
       remove: "Remove",
       checkout: "Checkout",
       continue: "Continue shopping",
+      openCart: "Open cart",
     },
     checkout: {
       title: "Checkout",
@@ -168,6 +169,7 @@ export const dictionaries = {
       remove: "إزالة",
       checkout: "إتمام الشراء",
       continue: "متابعة التسوق",
+      openCart: "فتح السلة",
     },
     checkout: {
       title: "إتمام الطلب",
