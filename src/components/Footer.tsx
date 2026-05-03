@@ -55,8 +55,12 @@ export function Footer() {
           </p>
         </div>
       </div>
-      <div className="border-t border-[rgb(var(--border))] py-4 text-center text-xs opacity-60">
-        © {new Date().getFullYear()} BOBOS Vapes Store
+      <div className="border-t border-[rgb(var(--border))] py-4 text-center text-xs opacity-60 flex flex-col sm:flex-row gap-2 justify-center items-center">
+        <span>© {new Date().getFullYear()} BOBOS Vapes Store</span>
+        <span className="hidden sm:inline opacity-50">·</span>
+        <Link to="/admin" className="opacity-70 hover:opacity-100 hover:text-brand-400">
+          Admin
+        </Link>
       </div>
     </footer>
   );

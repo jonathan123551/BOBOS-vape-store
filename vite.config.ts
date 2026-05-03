@@ -18,4 +18,18 @@ export default defineConfig({
     host: true,
     port: 3000,
   },
+  build: {
+    rollupOptions: {
+      output: {
+        // Split heavy / admin-only chunks so storefront pages stay light on
+        // mobile networks. Recharts (charts) and Supabase JS together are
+        // ~50% of total weight.
+        manualChunks: {
+          react: ["react", "react-dom", "react-router-dom"],
+          charts: ["recharts"],
+          supabase: ["@supabase/supabase-js"],
+        },
+      },
+    },
+  },
 });
