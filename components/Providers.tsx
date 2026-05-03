@@ -4,6 +4,7 @@ import { Toaster } from "react-hot-toast";
 import { CartProvider } from "./CartContext";
 import { ThemeProvider } from "./ThemeContext";
 import { LangProvider } from "./LangContext";
+import { FloatingCartButton } from "./FloatingCartButton";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -11,6 +12,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <LangProvider>
         <CartProvider>
           {children}
+          <FloatingCartButton />
           <Toaster
             position="top-center"
             toastOptions={{
